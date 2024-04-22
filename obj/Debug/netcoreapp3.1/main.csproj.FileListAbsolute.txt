@@ -1,0 +1,16 @@
+/home/runner/EnchantedCadetblueDecagons/obj/Debug/netcoreapp3.1/main.csproj.AssemblyReference.cache
+/home/runner/EnchantedCadetblueDecagons/obj/Debug/netcoreapp3.1/main.GeneratedMSBuildEditorConfig.editorconfig
+/home/runner/EnchantedCadetblueDecagons/obj/Debug/netcoreapp3.1/main.AssemblyInfoInputs.cache
+/home/runner/EnchantedCadetblueDecagons/obj/Debug/netcoreapp3.1/main.AssemblyInfo.cs
+/home/runner/EnchantedCadetblueDecagons/obj/Debug/netcoreapp3.1/main.csproj.CoreCompileInputs.cache
+/home/runner/EnchantedCadetblueDecagons/bin/Debug/netcoreapp3.1/main
+/home/runner/EnchantedCadetblueDecagons/bin/Debug/netcoreapp3.1/main.deps.json
+/home/runner/EnchantedCadetblueDecagons/bin/Debug/netcoreapp3.1/main.runtimeconfig.json
+/home/runner/EnchantedCadetblueDecagons/bin/Debug/netcoreapp3.1/main.runtimeconfig.dev.json
+/home/runner/EnchantedCadetblueDecagons/bin/Debug/netcoreapp3.1/main.dll
+/home/runner/EnchantedCadetblueDecagons/bin/Debug/netcoreapp3.1/main.pdb
+/home/runner/EnchantedCadetblueDecagons/bin/Debug/netcoreapp3.1/nunit.framework.dll
+/home/runner/EnchantedCadetblueDecagons/obj/Debug/netcoreapp3.1/main.csproj.CopyComplete
+/home/runner/EnchantedCadetblueDecagons/obj/Debug/netcoreapp3.1/main.dll
+/home/runner/EnchantedCadetblueDecagons/obj/Debug/netcoreapp3.1/main.pdb
+/home/runner/EnchantedCadetblueDecagons/obj/Debug/netcoreapp3.1/main.genruntimeconfig.cache

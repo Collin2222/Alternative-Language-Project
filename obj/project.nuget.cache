@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "pmOmFOCtWUdc0Gs1rGLJi0lXJnFR6Aoboiyx83hw4qCjU9a1L0IrwgwqX571wIBRQ0Weexkf+5BqdDxGIzuPQQ==",
+  "success": true,
+  "projectFilePath": "/home/runner/EnchantedCadetblueDecagons/main.csproj",
+  "expectedPackageFiles": [
+    "/home/runner/EnchantedCadetblueDecagons/.cache/.nuget/packages/nunit/4.1.0/nunit.4.1.0.nupkg.sha512"
+  ],
+  "logs": []
+}
