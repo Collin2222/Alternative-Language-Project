@@ -281,7 +281,7 @@ class Program
                 i++; // Increment counter
             }
             var cnt = new Dictionary<int, int>();
-            foreach (int value in theArray)
+            foreach (int value in announcedYears)
             {
                 if (cnt.ContainsKey(value))
                 {
