@@ -142,6 +142,7 @@ class Program
 
             // Count for phones with multiple features_sensors
             int multipleFeaturesCount = 0;
+            int announcedSwitchedCount = 0;
 
             // Loop counter
             int lineNumber = 0;
@@ -158,6 +159,17 @@ class Program
                 // Create a new Cell object
                 Cell cell = new Cell(columns[0], columns[1], columns[2], columns[3], columns[4], columns[5], columns[6], columns[7], columns[8], columns[9], columns[10], columns[11]);
 
+              // Check if the phone was announced in one year but made available in another
+              string[] announcedParts = columns[2].Split(',', '.'); // Splitting the announced date
+              string[] releasedParts = columns[3].Split(',', '.'); // Splitting the released date
+              if (announcedParts.Length > 1 && releasedParts.Length > 1 && announcedParts[1].Trim() != releasedParts[1].Trim())
+              {
+                  announcedSwitchedCount++;
+              }
+
+                //What year had the most phones launched in any year later than 1999? 
+
+              
                 // Check if features_sensors contains multiple entries
                 if (columns[10].Contains(","))
                 {
@@ -177,7 +189,9 @@ class Program
             }
 
             // Print out the count of phones with multiple features_sensors
-            Console.WriteLine($"Phones with multiple features_sensors: {multipleFeaturesCount}");
+            Console.WriteLine($"Number of phones with multiple features/sensors: {multipleFeaturesCount}");
+          // Print out the count of phones with multiple features_sensors
+          Console.WriteLine($"Number of phones announced in one year but released in another: {announcedSwitchedCount}");
         }
         else
         {
