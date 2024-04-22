@@ -165,6 +165,13 @@ class Program
             // Read all lines from the file
             string[] lines = File.ReadAllLines(filePath);
 
+            // Check if the file is not empty
+            if (lines.Length == 0)
+            {
+                Console.WriteLine("File is empty.");
+                return;
+            }
+          
             // Create dictionary to store Cell objects
             Dictionary<int, Cell> cellMap = new Dictionary<int, Cell>();
 
@@ -340,6 +347,16 @@ class Program
         }
     }
 
+
+
+
+
+
+/////////////////////////////////////////
+
+
+
+  
 
     // Function to split CSV line while handling quoted fields
     static string[] SplitCSVLine(string line)
