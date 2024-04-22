@@ -279,10 +279,15 @@ class Program
 
             i++; // Increment counter
         }
-        var query = (from item in announcedYears
-        group item by item into g
-        orderby g.Count() descending
-        select new { Item = g.Key, Count = g.Count() }).First();
+       
+        int mostCommonValue = 0;
+        int highestCount = 0;
+        foreach (KeyValuePair<int, int> pair in cnt) {
+           if (pair.Value > highestCount) {
+              mostCommonValue = pair.Key;
+              highestCount = pair.Value;
+           }
+        }
           
           // Print out the count of phones with multiple features_sensors
           Console.WriteLine($"Number of phones with multiple features/sensors: {multipleFeaturesCount}");
@@ -310,10 +315,10 @@ class Program
           // Print out the count of phones with only one feature sensor
           Console.WriteLine($"Number of phones with only one feature / sensor: {phonesWithOneFeatureSensor}");
 
-          
+          Console.WriteLine($"The year with the highest phone production after 1999 was {mostCommonValue} with {highestCount} number of phones");
+
         // Call the methods to perform the checks
         CheckHighestAverageWeight(cellMap);
-        CheckYearWithMostPhoneLaunches(cellMap);
       }
       else
       {
@@ -357,25 +362,9 @@ class Program
 
         var highestAverageWeightOEM = oemAverageWeights.OrderByDescending(x => x.Value).FirstOrDefault();
 
-        Console.WriteLine($"Company with the highest average weight of the phone body: {highestAverageWeightOEM.Key}");
+        Console.WriteLine($"Company with the highest average weight of the phone body: {highestAverageWeightOEM.Value}");
     }
 
  
-    // Function to check the year with the most phones launched in any year later than 1999
-    static void CheckYearWithMostPhoneLaunches(Dictionary<int, Cell> cellMap)
-    {
-        var phonesLaunchedByYear = cellMap.Values.GroupBy(cell =>
-        {
-            if (DateTime.TryParse(cell.LaunchAnnounced, out DateTime launchDate))
-            {
-                return launchDate.Year;
-            }
-            return -1;
-        }).Where(group => group.Key > 1999)
-          .ToDictionary(group => group.Key, group => group.Count());
-
-        var yearWithMostLaunches = phonesLaunchedByYear.OrderByDescending(x => x.Value).FirstOrDefault();
-
-        Console.WriteLine($"Year with the most phones launched (later than 1999): {yearWithMostLaunches.Key}");
-    }
+   
 }
