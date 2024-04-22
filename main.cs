@@ -255,6 +255,7 @@ class Program
         // Arrays to store announcedYear and releasedYear
         int[] announcedYears = new int[cellMap.Count];
         int[] releasedYears = new int[cellMap.Count];
+        int announceReleaseDissimilarity=0;
 
         // Loop counter
         int i = 0;
@@ -263,10 +264,13 @@ class Program
         foreach (KeyValuePair<int, Cell> kvp in cellMap)
         {
             // Extract announcedYear and releasedYear
+            if( kvp.Value.GetYear(kvp.Value.LaunchAnnounced) >1999){
             announcedYears[i] = kvp.Value.GetYear(kvp.Value.LaunchAnnounced);
+            }
             releasedYears[i] = kvp.Value.GetYear(kvp.Value.LaunchStatus);
             if(releasedYears[i] !=-1 && announcedYears[i] !=-1 && releasedYears[i] != announcedYears[i])
               {
+                announceReleaseDissimilarity +=1;
                 announcedReleasedMismatch.Add(kvp.Key.ToString());
               }
             Console.WriteLine($"Index: {kvp.Key}");
@@ -275,6 +279,10 @@ class Program
 
             i++; // Increment counter
         }
+        var query = (from item in announcedYears
+        group item by item into g
+        orderby g.Count() descending
+        select new { Item = g.Key, Count = g.Count() }).First();
           
           // Print out the count of phones with multiple features_sensors
           Console.WriteLine($"Number of phones with multiple features/sensors: {multipleFeaturesCount}");
@@ -287,6 +295,8 @@ class Program
               foreach (var phone in announcedReleasedMismatch)
               {
                   Console.WriteLine(phone);
+                  Console.WriteLine(announceReleaseDissimilarity);
+
               }
           }
 
