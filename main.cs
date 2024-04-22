@@ -17,6 +17,8 @@ class Cell
     public string DisplayResolution { get; set; }
     public string FeaturesSensors { get; set; }
     public string PlatformOS { get; set; }
+    public int announcedYear{get; set;}
+    public int releasedYear{get;set;}
 
     // Constructor
     public Cell(string oem, string model, string launchAnnounced, string launchStatus, string bodyDimensions, string bodyWeight, string bodySim, string displayType, string displaySize, string displayResolution, string featuresSensors, string platformOS)
@@ -33,13 +35,35 @@ class Cell
         DisplayResolution = displayResolution;
         FeaturesSensors = featuresSensors;
         PlatformOS = platformOS;
+        announcedYear = announcedYear;
+        releasedYear = releasedYear;
     }
 
     // ToString method to convert object details to a string
     public override string ToString()
     {
-        return $"OEM: {OEM}\nModel: {Model}\nLaunch Announced: {LaunchAnnounced}\nLaunch Status: {LaunchStatus}\nBody Dimensions: {BodyDimensions}\nBody Weight: {BodyWeight}\nBody SIM: {BodySim}\nDisplay Type: {DisplayType}\nDisplay Size: {DisplaySize}\nDisplay Resolution: {DisplayResolution}\nFeatures & Sensors: {FeaturesSensors}\nPlatform OS: {PlatformOS}";
+       announcedYear = GetYear(LaunchAnnounced);
+       releasedYear = GetYear(LaunchStatus);
+      
+      
+      return $"OEM: {OEM}\nModel: {Model}\nLaunch Announced: {LaunchAnnounced} ({announcedYear})\nLaunch Status: {LaunchStatus} ({releasedYear})\nBody Dimensions: {BodyDimensions}\nBody Weight: {BodyWeight}\nBody SIM: {BodySim}\nDisplay Type: {DisplayType}\nDisplay Size: {DisplaySize}\nDisplay Resolution: {DisplayResolution}\nFeatures & Sensors: {FeaturesSensors}\nPlatform OS: {PlatformOS}";
+
     }
+  // Method to extract year from a date string
+  public int GetYear(string date)
+  {
+      int year;
+      string[] parts = date.Split(new char[] { ',', '.', ' ', '"' }, StringSplitOptions.RemoveEmptyEntries);
+      foreach (string part in parts)
+      {
+          if (int.TryParse(part, out year))
+          {
+              return year;
+          }
+      }
+      return -1; // Indicate no valid year found
+  }
+
 
     // Method to calculate mean of numeric columns
     public double CalculateMean(string column)
@@ -122,82 +146,171 @@ class Cell
         FeaturesSensors = "";
         PlatformOS = "";
     }
+  
 }
 
 class Program
 {
-    static void Main()
-    {
-        // File path
-        string filePath = "cells.csv";
+  static int yearMix;
+  int[] arra;
 
-        // Check if file exists
-        if (File.Exists(filePath))
-        {
-            // Read all lines from the file
-            string[] lines = File.ReadAllLines(filePath);
+  static void Main()
+  {
+      // File path
+      string filePath = "cells.csv";
 
-            // Create dictionary to store Cell objects
-            Dictionary<int, Cell> cellMap = new Dictionary<int, Cell>();
+      // Check if file exists
+      if (File.Exists(filePath))
+      {
+          // Read all lines from the file
+          string[] lines = File.ReadAllLines(filePath);
 
-            // Count for phones with multiple features_sensors
-            int multipleFeaturesCount = 0;
-            int announcedSwitchedCount = 0;
+          // Create dictionary to store Cell objects
+          Dictionary<int, Cell> cellMap = new Dictionary<int, Cell>();
 
-            // Loop counter
-            int lineNumber = 0;
+          // Count for phones with multiple features_sensors
+          int multipleFeaturesCount = 0;
+          int announcedSwitchedCount = 0;
 
-            // Iterate through each line
-            foreach (string line in lines)
-            {
-                // Increment line number
-                lineNumber++;
+          // Variables to store highest average weight of phone body
+          Dictionary<string, (double sum, int count)> weightSumByOEM = new Dictionary<string, (double, int)>();
 
-                // Split the line into columns
-                string[] columns = SplitCSVLine(line);
+          // Variables to track phones announced in one year and released in another
+          List<string> announcedReleasedMismatch = new List<string>();
 
-                // Create a new Cell object
-                Cell cell = new Cell(columns[0], columns[1], columns[2], columns[3], columns[4], columns[5], columns[6], columns[7], columns[8], columns[9], columns[10], columns[11]);
+          // Variables to track phones with only one feature sensor
+          int phonesWithOneFeatureSensor = 0;
+
+          // Variables to track the year with the most phones launched
+          Dictionary<int, int> phonesLaunchedByYear = new Dictionary<int, int>();
+
+          // Loop counter
+          int lineNumber = 0;
+
+          // Iterate through each line
+          foreach (string line in lines)
+          {
+              // Increment line number
+              lineNumber++;
+
+              // Split the line into columns
+              string[] columns = SplitCSVLine(line);
+
+              // Create a new Cell object
+              Cell cell = new Cell(columns[0], columns[1], columns[2], columns[3], columns[4], columns[5], columns[6], columns[7], columns[8], columns[9], columns[10], columns[11]);
+
+              // Calculate average weight of the phone body for each OEM
+              if (double.TryParse(columns[5], out double weight))
+              {
+                  if (!weightSumByOEM.ContainsKey(columns[0]))
+                  {
+                      weightSumByOEM[columns[0]] = (weight, 1);
+                  }
+                  else
+                  {
+                      var (sum, count) = weightSumByOEM[columns[0]];
+                      weightSumByOEM[columns[0]] = (sum + weight, count + 1);
+                  }
+              }
 
               // Check if the phone was announced in one year but made available in another
               string[] announcedParts = columns[2].Split(',', '.'); // Splitting the announced date
               string[] releasedParts = columns[3].Split(',', '.'); // Splitting the released date
-              if (announcedParts.Length > 1 && releasedParts.Length > 1 && announcedParts[1].Trim() != releasedParts[1].Trim())
+            
+              
+              
+
+              // Check if features_sensors contains multiple entries
+              if (columns[10].Contains(","))
               {
-                  announcedSwitchedCount++;
+                  multipleFeaturesCount++;
               }
 
-                //What year had the most phones launched in any year later than 1999? 
+              // Count phones with only one feature sensor
+              if (!string.IsNullOrWhiteSpace(columns[10]) && !columns[10].Contains(","))
+              {
+                  phonesWithOneFeatureSensor++;
+              }
 
-              
-                // Check if features_sensors contains multiple entries
-                if (columns[10].Contains(","))
-                {
-                    multipleFeaturesCount++;
-                }
+              // Count phones launched by year
+              if (DateTime.TryParse(columns[2], out DateTime launchDate))
+              {
+                  int year = launchDate.Year;
+                  if (year > 1999)
+                  {
+                      if (phonesLaunchedByYear.ContainsKey(year))
+                      {
+                          phonesLaunchedByYear[year]++;
+                      }
+                      else
+                      {
+                          phonesLaunchedByYear[year] = 1;
+                      }
+                  }
+              }
 
-                // Add the object to the dictionary
-                cellMap.Add(lineNumber, cell);
-            }
+              // Add the object to the dictionary
+              cellMap.Add(lineNumber, cell);
+          }
+        // Arrays to store announcedYear and releasedYear
+        int[] announcedYears = new int[cellMap.Count];
+        int[] releasedYears = new int[cellMap.Count];
 
-            // Print out the contents of the dictionary
-            foreach (KeyValuePair<int, Cell> kvp in cellMap)
-            {
-                Console.WriteLine($"Index: {kvp.Key}");
-                Console.WriteLine(kvp.Value.ToString()); // Using ToString() method to print object details
-                Console.WriteLine();
-            }
+        // Loop counter
+        int i = 0;
 
-            // Print out the count of phones with multiple features_sensors
-            Console.WriteLine($"Number of phones with multiple features/sensors: {multipleFeaturesCount}");
-          // Print out the count of phones with multiple features_sensors
-          Console.WriteLine($"Number of phones announced in one year but released in another: {announcedSwitchedCount}");
-        }
-        else
+        // Iterate through each cell in the dictionary
+        foreach (KeyValuePair<int, Cell> kvp in cellMap)
         {
-            Console.WriteLine("File does not exist.");
+            // Extract announcedYear and releasedYear
+            announcedYears[i] = kvp.Value.GetYear(kvp.Value.LaunchAnnounced);
+            releasedYears[i] = kvp.Value.GetYear(kvp.Value.LaunchStatus);
+            if(releasedYears[i] !=-1 && announcedYears[i] !=-1 && releasedYears[i] != announcedYears[i])
+              {
+                announcedReleasedMismatch.Add(kvp.Key.ToString());
+              }
+            Console.WriteLine($"Index: {kvp.Key}");
+            Console.WriteLine(kvp.Value.ToString()); // Using ToString() method to print object details
+            Console.WriteLine();
+
+            i++; // Increment counter
         }
-    }
+          
+          // Print out the count of phones with multiple features_sensors
+          Console.WriteLine($"Number of phones with multiple features/sensors: {multipleFeaturesCount}");
+
+          // Print out the count of phones announced in one year but released in another
+          Console.WriteLine($"Number of phones announced in one year but released in another: {announcedSwitchedCount}");
+          if (announcedSwitchedCount > 0)
+          {
+              Console.WriteLine("Phones announced in one year but released in another:");
+              foreach (var phone in announcedReleasedMismatch)
+              {
+                  Console.WriteLine(phone);
+              }
+          }
+
+          // Print out the average weight of the phone body for each OEM
+          if (weightSumByOEM.Any())
+          {
+              var highestAverageWeightOEM = weightSumByOEM.OrderByDescending(kv => kv.Value.sum / kv.Value.count).First().Key;
+              Console.WriteLine($"OEM with the highest average weight of the phone body: {highestAverageWeightOEM}");
+          }
+
+          // Print out the count of phones with only one feature sensor
+          Console.WriteLine($"Number of phones with only one feature / sensor: {phonesWithOneFeatureSensor}");
+
+          
+        // Call the methods to perform the checks
+        CheckHighestAverageWeight(cellMap);
+        CheckYearWithMostPhoneLaunches(cellMap);
+      }
+      else
+      {
+          Console.WriteLine("File does not exist.");
+      }
+  }
+
 
     // Function to split CSV line while handling quoted fields
     static string[] SplitCSVLine(string line)
@@ -223,5 +336,36 @@ class Program
         columns.Add(line.Substring(start)); // Add the last column
 
         return columns.ToArray();
+    }
+
+    // Function to check the company (oem) with the highest average weight of the phone body
+    static void CheckHighestAverageWeight(Dictionary<int, Cell> cellMap)
+    {
+        var oemAverageWeights = cellMap.Values.GroupBy(cell => cell.OEM)
+                                              .ToDictionary(group => group.Key,
+                                                            group => group.Average(cell => double.TryParse(cell.BodyWeight, out double weight) ? weight : 0));
+
+        var highestAverageWeightOEM = oemAverageWeights.OrderByDescending(x => x.Value).FirstOrDefault();
+
+        Console.WriteLine($"Company with the highest average weight of the phone body: {highestAverageWeightOEM.Key}");
+    }
+
+ 
+    // Function to check the year with the most phones launched in any year later than 1999
+    static void CheckYearWithMostPhoneLaunches(Dictionary<int, Cell> cellMap)
+    {
+        var phonesLaunchedByYear = cellMap.Values.GroupBy(cell =>
+        {
+            if (DateTime.TryParse(cell.LaunchAnnounced, out DateTime launchDate))
+            {
+                return launchDate.Year;
+            }
+            return -1;
+        }).Where(group => group.Key > 1999)
+          .ToDictionary(group => group.Key, group => group.Count());
+
+        var yearWithMostLaunches = phonesLaunchedByYear.OrderByDescending(x => x.Value).FirstOrDefault();
+
+        Console.WriteLine($"Year with the most phones launched (later than 1999): {yearWithMostLaunches.Key}");
     }
 }
